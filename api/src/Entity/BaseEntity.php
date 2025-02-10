@@ -7,9 +7,19 @@ use App\Repository\BaseRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=BaseRepository::class)
+ * @ORM\MappedSuperclass
  */
-class BaseEntity
+abstract class BaseEntity
 {
+    /**
+     * @ORM\Id
+     * @ORM\GeneratedValue
+     * @ORM\Column(type="integer")
+     */
+    protected $id;
 
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 }

@@ -3,21 +3,15 @@
 namespace App\Entity;
 
 use App\Repository\CreditProgramRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=CreditProgramRepository::class)
  */
-class CreditProgram
+class CreditProgram extends BaseEntity
 {
-
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
-
     /**
      * @ORM\Column(type="float")
      */
@@ -38,9 +32,14 @@ class CreditProgram
      */
     private $loanTerm;
 
-    public function getId(): ?int
+    /**
+     * @ORM\OneToMany(targetEntity=CreditRequest::class, mappedBy="creditProgram", orphanRemoval=true)
+     */
+    private $creditRequests;
+
+    public function __construct()
     {
-        return $this->id;
+        $this->creditRequests = new ArrayCollection();
     }
 
     public function getInterestRate(): ?float
@@ -87,6 +86,36 @@ class CreditProgram
     public function setLoanTerm(int $loanTerm): self
     {
         $this->loanTerm = $loanTerm;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CreditRequest>
+     */
+    public function getCreditRequests(): Collection
+    {
+        return $this->creditRequests;
+    }
+
+    public function addCreditRequest(CreditRequest $creditRequest): self
+    {
+        if (!$this->creditRequests->contains($creditRequest)) {
+            $this->creditRequests[] = $creditRequest;
+            $creditRequest->setCreditProgram($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCreditRequest(CreditRequest $creditRequest): self
+    {
+        if ($this->creditRequests->removeElement($creditRequest)) {
+            // set the owning side to null (unless already changed)
+            if ($creditRequest->getCreditProgram() === $this) {
+                $creditRequest->setCreditProgram(null);
+            }
+        }
 
         return $this;
     }

@@ -3,21 +3,15 @@
 namespace App\Entity;
 
 use App\Repository\CarRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=CarRepository::class)
  */
-class Car
+class Car extends BaseEntity
 {
-
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
-
     /**
      * @ORM\ManyToOne(targetEntity=Brand::class, inversedBy="cars")
      * @ORM\JoinColumn(nullable=false)
@@ -40,10 +34,14 @@ class Car
      */
     private $model;
 
+    /**
+     * @ORM\OneToMany(targetEntity=CreditRequest::class, mappedBy="car")
+     */
+    private $creditRequests;
 
-    public function getId(): ?int
+    public function __construct()
     {
-        return $this->id;
+        $this->creditRequests = new ArrayCollection();
     }
 
     public function getBrand(): ?Brand
@@ -90,6 +88,36 @@ class Car
     public function setModel(?Model $model): self
     {
         $this->model = $model;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CreditRequest>
+     */
+    public function getCreditRequests(): Collection
+    {
+        return $this->creditRequests;
+    }
+
+    public function addCreditRequest(CreditRequest $creditRequest): self
+    {
+        if (!$this->creditRequests->contains($creditRequest)) {
+            $this->creditRequests[] = $creditRequest;
+            $creditRequest->setCar($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCreditRequest(CreditRequest $creditRequest): self
+    {
+        if ($this->creditRequests->removeElement($creditRequest)) {
+            // set the owning side to null (unless already changed)
+            if ($creditRequest->getCar() === $this) {
+                $creditRequest->setCar(null);
+            }
+        }
 
         return $this;
     }

@@ -13,22 +13,16 @@ class CreditProgramFixtures extends Fixture
     {
         $creditPrograms = [
             [
-                'title'          => 'Стандарт',
-                'interestRate'   => 12.3,
+                'title'          => 'Standard',
+                'interestRate'   => 2,
                 'initialPayment' => 200000,
                 'loanTerm'       => 60
             ],
             [
-                'title'          => 'Люкс',
-                'interestRate'   => 9.9,
-                'initialPayment' => 500000,
-                'loanTerm'       => 120
-            ],
-            [
-                'title'          => 'Эконом',
-                'interestRate'   => 30,
-                'initialPayment' => 100000,
-                'loanTerm'       => 36
+                'title'          => 'Economy',
+                'interestRate'   => 8,
+                'initialPayment' => 50000,
+                'loanTerm'       => 360
             ]
         ];
 
