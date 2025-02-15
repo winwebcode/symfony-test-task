@@ -23,9 +23,15 @@ class Brand extends BaseEntity
      */
     private $cars;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Model::class, mappedBy="brand")
+     */
+    private $models;
+
     public function __construct()
     {
-        $this->cars = new ArrayCollection();
+        $this->cars   = new ArrayCollection();
+        $this->models = new ArrayCollection();
     }
 
     public function getName(): ?string

@@ -16,6 +16,12 @@ class Model extends BaseEntity
      */
     private $name;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Brand::class, inversedBy="models")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $brand;
+
     public function getName(): ?string
     {
         return $this->name;
@@ -24,6 +30,18 @@ class Model extends BaseEntity
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getBrand(): ?Brand
+    {
+        return $this->brand;
+    }
+
+    public function setBrand(?Brand $brand): self
+    {
+        $this->brand = $brand;
 
         return $this;
     }

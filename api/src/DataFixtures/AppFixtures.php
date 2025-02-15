@@ -40,6 +40,7 @@ class AppFixtures extends Fixture
             foreach ($data['models'] as $index => $modelName) {
                 $model = new Model();
                 $model->setName($modelName);
+                $model->setBrand($brand);
                 $manager->persist($model);
 
                 $car = new Car();
