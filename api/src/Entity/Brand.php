@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Brand extends BaseEntity
 {
+
     /**
      * @ORM\Column(type="string", length=255)
      */

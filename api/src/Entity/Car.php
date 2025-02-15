@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Car extends BaseEntity
 {
+
     /**
      * @ORM\ManyToOne(targetEntity=Brand::class, inversedBy="cars")
      * @ORM\JoinColumn(nullable=false)

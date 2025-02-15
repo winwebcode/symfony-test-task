@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Serializer\SerializerInterface;
+use App\DTO\CarDto;
 
 class CarController extends AbstractController
 {
@@ -15,29 +17,24 @@ class CarController extends AbstractController
     /**
      * @Route("/api/v1/cars", name="api_cars", methods={"GET"})
      */
-    public function list(CarRepository $carRepository): JsonResponse
+    public function list(CarRepository $carRepository, SerializerInterface $serializer): JsonResponse
     {
-        $cars = $carRepository->findAll();
+        $cars    = $carRepository->findAll();
+        $carDtos = [];
 
         foreach ($cars as $car) {
-            $data[] = [
-                'id'    => $car->getId(),
-                'brand' => [
-                    'id'   => $car->getBrand()->getId(),
-                    'name' => $car->getBrand()->getName(),
-                ],
-                'photo' => $car->getPhoto(),
-                'price' => $car->getPrice(),
-            ];
+            $carDtos[] = CarDto::createFromEntity($car);
         }
 
-        return new JsonResponse($data);
+        $json = $serializer->serialize($carDtos, 'json');
+
+        return new JsonResponse($json, Response::HTTP_OK, [], true);
     }
 
     /**
      * @Route("/api/v1/cars/{id}", name="api_show_car", methods={"GET"})
      */
-    public function show(int $id, CarRepository $carRepository): JsonResponse
+    public function show(int $id, CarRepository $carRepository, SerializerInterface $serializer): JsonResponse
     {
         $car = $carRepository->find($id);
 
@@ -45,20 +42,9 @@ class CarController extends AbstractController
             throw new NotFoundHttpException('Car not found');
         }
 
-        $data = [
-            'id'    => $car->getId(),
-            'brand' => [
-                'id'   => $car->getBrand()->getId(),
-                'name' => $car->getBrand()->getName(),
-            ],
-            'model' => [
-                'id'   => $car->getModel()->getId(),
-                'name' => $car->getModel()->getName(),
-            ],
-            'photo' => $car->getPhoto(),
-            'price' => $car->getPrice(),
-        ];
+        $carDto = CarDto::createFromEntity($car);
+        $json   = $serializer->serialize($carDto, 'json');
 
-        return new JsonResponse($data);
+        return new JsonResponse($json, Response::HTTP_OK, [], true);
     }
 }

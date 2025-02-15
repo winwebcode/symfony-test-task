@@ -19,8 +19,6 @@ class CreditService extends BaseService
 
     public function calculate(CreditCalculateDTO $dto): array
     {
-        $this->validate($dto);
-
         $program = $this->creditProgramRepository->findSuitableProgram(
             $dto->getInitialPayment(),
             $dto->getLoanTerm(),
