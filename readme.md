@@ -2,9 +2,15 @@
 
 2. Запустите докер - docker-compose up -d --build 
 
-3. Создайте БД - php bin/console doctrine:database:create 
+3. Сделайте composer install
 
-4. Примените миграции - php bin/console doctrine:migrations:migrate --no-interaction
+4. Создайте БД - php bin/console doctrine:database:create 
 
-5. Загрузите тестовые данные - php bin/console doctrine:fixtures:load
+5.Примените миграции - php bin/console doctrine:migrations:migrate --no-interaction
 
+6.Загрузите тестовые данные - php bin/console doctrine:fixtures:load
+
+
+URL:
+
+http://artsofte.local/api/doc - API documentation
