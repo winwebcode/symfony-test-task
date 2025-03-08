@@ -3,18 +3,17 @@
 namespace App\Controller;
 
 use OpenApi\Annotations as OA;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use App\Repository\CarRepository;
+use App\Service\CarService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;
-use App\DTO\CarDto;
 
 class CarController extends AbstractController
 {
+
 
     /**
      * Get list of all cars
@@ -43,16 +42,10 @@ class CarController extends AbstractController
      *     )
      * )
      */
-    public function list(CarRepository $carRepository, SerializerInterface $serializer): JsonResponse
+    public function list(CarService $carService, SerializerInterface $serializer): JsonResponse
     {
-        $cars    = $carRepository->findAll();
-        $carDtos = [];
-
-        foreach ($cars as $car) {
-            $carDtos[] = CarDto::createFromEntity($car);
-        }
-
-        $json = $serializer->serialize($carDtos, 'json');
+        $carDtos = $carService->getAllCars();
+        $json    = $serializer->serialize($carDtos, 'json');
 
         return new JsonResponse($json, Response::HTTP_OK, [], true);
     }
@@ -89,17 +82,17 @@ class CarController extends AbstractController
      *     )
      * )
      */
-    public function show(int $id, CarRepository $carRepository, SerializerInterface $serializer): JsonResponse
+    public function show(int $id, CarService $carService, SerializerInterface $serializer): JsonResponse
     {
-        $car = $carRepository->find($id);
+        try {
+            $carDto = $carService->getCarById($id);
+            $json   = $serializer->serialize($carDto, 'json');
 
-        if (!$car) {
-            throw new NotFoundHttpException('Car not found');
+            return new JsonResponse($json, Response::HTTP_OK, [], true);
+
+        } catch (NotFoundHttpException $e) {
+
+            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_NOT_FOUND);
         }
-
-        $carDto = CarDto::createFromEntity($car);
-        $json   = $serializer->serialize($carDto, 'json');
-
-        return new JsonResponse($json, Response::HTTP_OK, [], true);
     }
 }

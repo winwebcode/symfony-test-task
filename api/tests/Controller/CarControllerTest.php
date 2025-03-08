@@ -3,10 +3,8 @@
 namespace App\Tests\carController;
 
 use App\Controller\CarController;
-use App\Entity\Car;
-use App\Entity\Brand;
-use App\Entity\Model;
-use App\Repository\CarRepository;
+use App\DTO\CarDto;
+use App\Service\CarService;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -14,22 +12,22 @@ use Symfony\Component\Serializer\SerializerInterface;
 class CarControllerTest extends KernelTestCase
 {
 
-    private $carRepository;
+    private $carService;
 
     private $serializer;
 
     private $carController;
 
-    private $testCar;
+    private $testCarDto;
 
     private $expectedJson;
 
     protected function setUp(): void
     {
-        $this->carRepository = $this->createMock(CarRepository::class);
+        $this->carService    = $this->createMock(CarService::class);
         $this->serializer    = $this->createMock(SerializerInterface::class);
         $this->carController = new CarController();
-        $this->testCar       = $this->createTestCar();
+        $this->testCarDto    = $this->createMock(CarDto::class);
         $this->expectedJson  = json_encode([
             'id'    => 1,
             'brand' => 'BMW',
@@ -39,44 +37,14 @@ class CarControllerTest extends KernelTestCase
         ]);
     }
 
-
-    private function createTestCar(): Car
-    {
-        $brand = new Brand();
-        $brand->setName('BMW');
-        $this->setEntityId($brand, 1);
-
-        $model = new Model();
-        $model->setName('X5');
-        $model->setBrand($brand);
-        $this->setEntityId($model, 1);
-
-        $car = new Car();
-        $car->setBrand($brand)
-            ->setModel($model)
-            ->setPrice(4500000)
-            ->setPhoto('https://testdomain.com/photo.jpg');
-        $this->setEntityId($car, 1);
-
-        return $car;
-    }
-
-
-    //Set ID for entity using Reflection
-    private function setEntityId(object $entity, int $id): void
-    {
-        $reflection = new \ReflectionClass(get_class($entity));
-        $property   = $reflection->getProperty('id');
-        $property->setAccessible(true);
-        $property->setValue($entity, $id);
-    }
-
     public function testList(): void
     {
-        $this->carRepository
+        $carDtoArray = [$this->testCarDto];
+
+        $this->carService
             ->expects($this->once())
-            ->method('findAll')
-            ->willReturn([$this->testCar]);
+            ->method('getAllCars')
+            ->willReturn($carDtoArray);
 
         $this->serializer
             ->expects($this->once())
@@ -84,38 +52,40 @@ class CarControllerTest extends KernelTestCase
             ->willReturn(json_encode([$this->expectedJson]));
 
         // Call carController method and assert response
-        $response = $this->carController->list($this->carRepository, $this->serializer);
+        $response = $this->carController->list($this->carService, $this->serializer);
         $this->assertSuccessfulJsonResponse($response);
     }
 
     public function testShow(): void
     {
-        $this->carRepository
+        $this->carService
             ->expects($this->once())
-            ->method('find')
+            ->method('getCarById')
             ->with(1)
-            ->willReturn($this->testCar);
+            ->willReturn($this->testCarDto);
 
         $this->serializer
             ->expects($this->once())
             ->method('serialize')
             ->willReturn($this->expectedJson);
 
-        $response = $this->carController->show(1, $this->carRepository, $this->serializer);
+        $response = $this->carController->show(1, $this->carService, $this->serializer);
         $this->assertSuccessfulJsonResponse($response);
     }
 
     public function testShowNotFound(): void
     {
-        $this->carRepository
+        $this->carService
             ->expects($this->once())
-            ->method('find')
+            ->method('getCarById')
             ->with(999)
-            ->willReturn(null);
+            ->willThrowException(new NotFoundHttpException('Car not found'));
 
-        $this->expectException(NotFoundHttpException::class);
-        $this->expectExceptionMessage('Car not found');
-        $this->carController->show(999, $this->carRepository, $this->serializer);
+        $response = $this->carController->show(999, $this->carService, $this->serializer);
+        $this->assertEquals(404, $response->getStatusCode());
+        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
+        $this->assertJson($response->getContent());
+        $this->assertStringContainsString('Car not found', $response->getContent());
     }
 
     private function assertSuccessfulJsonResponse($response): void
