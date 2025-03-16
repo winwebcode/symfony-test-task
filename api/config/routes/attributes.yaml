@@ -1,0 +1,7 @@
+controllers:
+  resource: /var/www/html/api/src/Controller/
+  type: attribute
+
+kernel:
+  resource: /var/www/html/api/src/Kernel.php
+  type: attribute

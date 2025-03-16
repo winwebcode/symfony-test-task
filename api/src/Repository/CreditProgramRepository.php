@@ -17,9 +17,8 @@ use Exception;
  */
 class CreditProgramRepository extends BaseRepository
 {
-
-    const STANDARD_PROGRAM_MONTHLY_LOAN_PAYMENT = 10000;
-    const STANDARD_PROGRAM_NAME = 'Standard';
+    private const STANDARD_PROGRAM_MONTHLY_LOAN_PAYMENT = 10000;
+    private const STANDARD_PROGRAM_NAME = 'Standard';
 
     public function __construct(ManagerRegistry $registry)
     {
@@ -36,16 +35,13 @@ class CreditProgramRepository extends BaseRepository
 
         if ($initialPayment > $standardProgram->getInitialPayment()
             && $monthlyLoanPayment <= self::STANDARD_PROGRAM_MONTHLY_LOAN_PAYMENT
-            && $loanTerm <= $standardProgram->getLoanTerm()) {
-
-            return $this->findOneBy(['title' => self::STANDARD_PROGRAM_NAME]);
+            && $loanTerm <= $standardProgram->getLoanTerm()
+        ) {
+            return $standardProgram;
         }
 
-        $queryBuilder = $this->createQueryBuilder('cp');
-
-        return $queryBuilder
-            ->select()
-            ->where("cp.title != :title")
+        return $this->createQueryBuilder('cp')
+            ->where('cp.title != :title')
             ->setParameter('title', self::STANDARD_PROGRAM_NAME)
             ->getQuery()
             ->setMaxResults(1)

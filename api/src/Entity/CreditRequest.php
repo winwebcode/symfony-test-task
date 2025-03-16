@@ -5,59 +5,48 @@ namespace App\Entity;
 use App\Repository\CreditRequestRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=CreditRequestRepository::class)
- */
+#[ORM\Entity(repositoryClass: CreditRequestRepository::class)]
 class CreditRequest extends BaseEntity
 {
+    #[ORM\ManyToOne(targetEntity: Car::class, inversedBy: 'creditRequests')]
+    #[ORM\JoinColumn(nullable: false)]
+    private Car $car;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Car::class, inversedBy="creditRequests")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $car;
+    #[ORM\ManyToOne(targetEntity: CreditProgram::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private CreditProgram $creditProgram;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=CreditProgram::class, inversedBy="creditRequests")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $creditProgram;
+    #[ORM\Column(type: 'float')]
+    private float $initialPayment;
 
-    /**
-     * @ORM\Column(type="float")
-     */
-    private $initialPayment;
+    #[ORM\Column(type: 'integer')]
+    private int $loanTerm;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $loanTerm;
-
-    public function getCar(): ?Car
+    public function getCar(): Car
     {
         return $this->car;
     }
 
-    public function setCar(?Car $car): self
+    public function setCar(Car $car): self
     {
         $this->car = $car;
-
+        
         return $this;
     }
 
-    public function getCreditProgram(): ?CreditProgram
+    public function getCreditProgram(): CreditProgram
     {
         return $this->creditProgram;
     }
 
-    public function setCreditProgram(?CreditProgram $creditProgram): self
+    public function setCreditProgram(CreditProgram $creditProgram): self
     {
         $this->creditProgram = $creditProgram;
 
         return $this;
     }
 
-    public function getInitialPayment(): ?float
+    public function getInitialPayment(): float
     {
         return $this->initialPayment;
     }
@@ -69,7 +58,7 @@ class CreditRequest extends BaseEntity
         return $this;
     }
 
-    public function getLoanTerm(): ?int
+    public function getLoanTerm(): int
     {
         return $this->loanTerm;
     }

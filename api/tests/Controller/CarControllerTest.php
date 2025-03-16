@@ -5,22 +5,30 @@ namespace App\Tests\carController;
 use App\Controller\CarController;
 use App\DTO\CarDto;
 use App\Service\CarService;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class CarControllerTest extends KernelTestCase
+class CarControllerTest extends TestCase
 {
 
-    private $carService;
+    private const EXPECTED_DATA = [
+        'id'    => 1,
+        'brand' => 'BMW',
+        'model' => 'X5',
+        'price' => 4500000,
+        'photo' => 'https://testdomain.com/bmw-x5.jpg'
+    ];
 
-    private $serializer;
+    private CarService $carService;
 
-    private $carController;
+    private SerializerInterface $serializer;
 
-    private $testCarDto;
+    private CarController $carController;
 
-    private $expectedJson;
+    private CarDto $testCarDto;
+
+    private string $expectedJson;
 
     protected function setUp(): void
     {
@@ -28,18 +36,13 @@ class CarControllerTest extends KernelTestCase
         $this->serializer    = $this->createMock(SerializerInterface::class);
         $this->carController = new CarController();
         $this->testCarDto    = $this->createMock(CarDto::class);
-        $this->expectedJson  = json_encode([
-            'id'    => 1,
-            'brand' => 'BMW',
-            'model' => 'X5',
-            'price' => 4500000,
-            'photo' => 'https://testdomain.com/photo.jpg'
-        ]);
+        $this->expectedJson  = json_encode(self::EXPECTED_DATA);
     }
 
-    public function testList(): void
+    public function test_List_WithValidData_ShouldReturnSuccessfulJsonResponse(): void
     {
-        $carDtoArray = [$this->testCarDto];
+        $carDtoArray            = [$this->testCarDto];
+        $expectedSerializedData = json_encode([$this->expectedJson]);
 
         $this->carService
             ->expects($this->once())
@@ -49,49 +52,51 @@ class CarControllerTest extends KernelTestCase
         $this->serializer
             ->expects($this->once())
             ->method('serialize')
-            ->willReturn(json_encode([$this->expectedJson]));
+            ->with($carDtoArray, 'json')
+            ->willReturn($expectedSerializedData);
 
-        // Call carController method and assert response
         $response = $this->carController->list($this->carService, $this->serializer);
-        $this->assertSuccessfulJsonResponse($response);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
+        $this->assertEquals($expectedSerializedData, $response->getContent());
     }
 
-    public function testShow(): void
+    public function test_Show_WithExistingCar_ShouldReturnSuccessfulJsonResponse(): void
     {
+        $carId = self::EXPECTED_DATA['id'];
+
         $this->carService
             ->expects($this->once())
             ->method('getCarById')
-            ->with(1)
+            ->with($carId)
             ->willReturn($this->testCarDto);
 
         $this->serializer
             ->expects($this->once())
             ->method('serialize')
+            ->with($this->testCarDto, 'json')
             ->willReturn($this->expectedJson);
 
-        $response = $this->carController->show(1, $this->carService, $this->serializer);
-        $this->assertSuccessfulJsonResponse($response);
+        $response = $this->carController->show($carId, $this->carService, $this->serializer);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
+        $this->assertEquals($this->expectedJson, $response->getContent());
     }
 
-    public function testShowNotFound(): void
+    public function test_Show_WithNonExistentCar_ShouldReturn404Response(): void
     {
+        $nonExistentCarId     = 99999999;
+        $expectedErrorMessage = 'Car not found';
+
         $this->carService
             ->expects($this->once())
             ->method('getCarById')
-            ->with(999)
-            ->willThrowException(new NotFoundHttpException('Car not found'));
+            ->with($nonExistentCarId)
+            ->willThrowException(new NotFoundHttpException($expectedErrorMessage));
 
-        $response = $this->carController->show(999, $this->carService, $this->serializer);
+        $response = $this->carController->show($nonExistentCarId, $this->carService, $this->serializer);
         $this->assertEquals(404, $response->getStatusCode());
         $this->assertEquals('application/json', $response->headers->get('Content-Type'));
-        $this->assertJson($response->getContent());
-        $this->assertStringContainsString('Car not found', $response->getContent());
-    }
-
-    private function assertSuccessfulJsonResponse($response): void
-    {
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
-        $this->assertJson($response->getContent());
+        $this->assertStringContainsString($expectedErrorMessage, $response->getContent());
     }
 } 

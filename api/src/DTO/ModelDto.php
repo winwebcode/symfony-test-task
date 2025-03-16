@@ -1,14 +1,23 @@
 <?php
+
 namespace App\DTO;
 
 class ModelDto
 {
-    public int $id;
-    public string $name;
 
-    public function __construct(int $id, string $name)
+    public function __construct(
+        private int    $id,
+        private string $name
+    ) {
+    }
+
+    public function getId(): int
     {
-        $this->id = $id;
-        $this->name = $name;
+        return $this->id;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
     }
 } 

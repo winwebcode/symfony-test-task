@@ -10,31 +10,35 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=BrandRepository::class)
  */
+#[ORM\Entity(repositoryClass: BrandRepository::class)]
 class Brand extends BaseEntity
 {
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $name;
+    #[ORM\Column(type: 'string', length: 255)]
+    private string $name;
 
     /**
      * @ORM\OneToMany(targetEntity=Car::class, mappedBy="brand")
      */
-    private $cars;
+    #[ORM\OneToMany(targetEntity: Car::class, mappedBy: 'brand')]
+    private Collection $cars;
 
     /**
      * @ORM\OneToMany(targetEntity=Model::class, mappedBy="brand")
      */
-    private $models;
+    #[ORM\OneToMany(targetEntity: Model::class, mappedBy: 'brand')]
+    private Collection $models;
 
     public function __construct()
     {
-        $this->cars   = new ArrayCollection();
+        $this->cars = new ArrayCollection();
         $this->models = new ArrayCollection();
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -42,7 +46,6 @@ class Brand extends BaseEntity
     public function setName(string $name): self
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -57,10 +60,9 @@ class Brand extends BaseEntity
     public function addCar(Car $car): self
     {
         if (!$this->cars->contains($car)) {
-            $this->cars[] = $car;
+            $this->cars->add($car);
             $car->setBrand($this);
         }
-
         return $this;
     }
 
@@ -72,7 +74,14 @@ class Brand extends BaseEntity
                 $car->setBrand(null);
             }
         }
-
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Model>
+     */
+    public function getModels(): Collection
+    {
+        return $this->models;
     }
 }

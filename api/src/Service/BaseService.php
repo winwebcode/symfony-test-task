@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Service;
 
 use InvalidArgumentException;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -19,6 +19,7 @@ class BaseService
     {
         if (count($errors) > 0) {
             $errorMessages = [];
+
             foreach ($errors as $error) {
                 //returns the path to the property that failed validation
                 $errorMessages[$error->getPropertyPath()] = $error->getMessage();
@@ -27,7 +28,7 @@ class BaseService
         }
     }
 
-    public function validate(object $dto)
+    public function validate(object $dto): void
     {
         $errors = $this->validator->validate($dto);
         $this->validationErrors($errors);

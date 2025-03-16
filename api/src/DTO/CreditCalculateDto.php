@@ -8,46 +8,30 @@ use Symfony\Component\Validator\Constraints as Assert;
 class CreditCalculateDto
 {
 
-    /**
-     * @Assert\NotBlank(message="Price is required")
-     * @Assert\Positive(message="Price must be positive")
-     * @Assert\Type(type="integer", message="Price must be an integer")
-     *
-     * @var int
-     */
-    private $price;
+    #[Assert\NotBlank(message: 'Price is required')]
+    #[Assert\Positive(message: 'Price must be positive')]
+    #[Assert\Type(type: 'integer', message: 'Price must be an integer')]
+    private int $price;
 
-    /**
-     * @Assert\NotBlank(message="Initial payment is required")
-     * @Assert\Positive(message="Initial payment must be positive")
-     * @Assert\Type(type="float", message="Initial payment must be number")
-     *
-     * @var float
-     */
-    private $initialPayment;
+    #[Assert\NotBlank(message: 'Initial payment is required')]
+    #[Assert\Positive(message: 'Initial payment must be positive')]
+    #[Assert\Type(type: 'float', message: 'Initial payment must be number')]
+    private float $initialPayment;
 
-    /**
-     * @Assert\NotBlank(message="Loan term is required")
-     * @Assert\Positive(message="Loan term must be positive")
-     * @Assert\Type(type="integer", message="Loan term must be an integer")
-     *
-     * @var int
-     */
-    private $loanTerm;
+    #[Assert\NotBlank(message: 'Loan term is required')]
+    #[Assert\Positive(message: 'Loan term must be positive')]
+    #[Assert\Type(type: 'integer', message: 'Loan term must be an integer')]
+    private int $loanTerm;
 
-    /**
-     * @Assert\NotBlank(message="Monthly loan payment is required")
-     * @Assert\Type(type="float", message="Monthly loan payment must be a float")
-     * @Assert\PositiveOrZero(message="Monthly loan payment must be positive or zero")
-     *
-     * @var float
-     */
-    private $monthlyLoanPayment;
+    #[Assert\NotBlank(message: 'Monthly loan payment is required')]
+    #[Assert\Type(type: 'float', message: 'Monthly loan payment must be a float')]
+    #[Assert\PositiveOrZero(message: 'Monthly loan payment must be positive or zero')]
+    private float $monthlyLoanPayment;
 
 
     public static function createFromRequest(Request $request): self
     {
-        $dto = new self();
+        $dto        = new self();
         $dto->price = $request->query->getInt('price');
         //FILTER_FLAG_ALLOW_THOUSAND (allow symbol ',')
         $initialPayment     = filter_var($request->query->get('initialPayment'), FILTER_VALIDATE_FLOAT, FILTER_FLAG_ALLOW_THOUSAND);

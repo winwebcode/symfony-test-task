@@ -5,21 +5,16 @@ namespace App\Entity;
 use App\Repository\ModelRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=ModelRepository::class)
- */
+#[ORM\Entity(repositoryClass: ModelRepository::class)]
 class Model extends BaseEntity
 {
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $name;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Brand::class, inversedBy="models")
-     * @ORM\JoinColumn(nullable=false)
-     */
+
+    #[ORM\ManyToOne(targetEntity: Brand::class, inversedBy: 'models')]
+    #[ORM\JoinColumn(nullable: false)]
     private $brand;
 
     public function getName(): ?string

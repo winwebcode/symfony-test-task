@@ -7,30 +7,20 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=CreditProgramRepository::class)
- */
+#[ORM\Entity(repositoryClass: CreditProgramRepository::class)]
 class CreditProgram extends BaseEntity
 {
-    /**
-     * @ORM\Column(type="float")
-     */
+    #[ORM\Column(type: 'float')]
     private $interestRate;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $title;
+    #[ORM\Column(type: 'string', length: 255)]
+    private string $title;
 
-    /**
-     * @ORM\Column(type="float")
-     */
-    private $initialPayment;
+    #[ORM\Column(type: 'float')]
+    private float $initialPayment;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $loanTerm;
+    #[ORM\Column(type: 'integer')]
+    private int $loanTerm;
 
     /**
      * @ORM\OneToMany(targetEntity=CreditRequest::class, mappedBy="creditProgram", orphanRemoval=true)
@@ -54,7 +44,7 @@ class CreditProgram extends BaseEntity
         return $this;
     }
 
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -62,11 +52,10 @@ class CreditProgram extends BaseEntity
     public function setTitle(string $title): self
     {
         $this->title = $title;
-
         return $this;
     }
 
-    public function getInitialPayment(): ?float
+    public function getInitialPayment(): float
     {
         return $this->initialPayment;
     }
@@ -78,7 +67,7 @@ class CreditProgram extends BaseEntity
         return $this;
     }
 
-    public function getLoanTerm(): ?int
+    public function getLoanTerm(): int
     {
         return $this->loanTerm;
     }
@@ -86,7 +75,7 @@ class CreditProgram extends BaseEntity
     public function setLoanTerm(int $loanTerm): self
     {
         $this->loanTerm = $loanTerm;
-
+        
         return $this;
     }
 

@@ -6,17 +6,16 @@ use App\DTO\CarDto;
 use App\Repository\CarRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class CarService
+class CarService extends BaseService
 {
-
-    private CarRepository $carRepository;
-
-    public function __construct(CarRepository $carRepository)
-    {
-        $this->carRepository = $carRepository;
+    public function __construct(
+        private CarRepository $carRepository
+    ) {
     }
 
-
+    /**
+     * @return array<CarDto>
+     */
     public function getAllCars(): array
     {
         $cars    = $this->carRepository->findAll();

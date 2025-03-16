@@ -36,8 +36,7 @@ class CreditRequestRepository extends BaseRepository
             ->setInitialPayment($initialPayment)
             ->setLoanTerm($loanTerm);
 
-        $this->getEntityManager()->persist($request);
-        $this->getEntityManager()->flush();
+        $this->save($request, true);
 
         return $request;
     }

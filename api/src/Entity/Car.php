@@ -7,57 +7,44 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=CarRepository::class)
- */
+#[ORM\Entity(repositoryClass: CarRepository::class)]
 class Car extends BaseEntity
 {
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Brand::class, inversedBy="cars")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $brand;
+    #[ORM\ManyToOne(targetEntity: Brand::class, inversedBy: 'cars')]
+    #[ORM\JoinColumn(nullable: false)]
+    private Brand $brand;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $photo;
+    #[ORM\Column(type: 'string', length: 255)]
+    private string $photo;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $price;
+    #[ORM\Column(type: 'integer')]
+    private int $price;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Model::class)
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $model;
+    #[ORM\ManyToOne(targetEntity: Model::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private Model $model;
 
-    /**
-     * @ORM\OneToMany(targetEntity=CreditRequest::class, mappedBy="car")
-     */
-    private $creditRequests;
+    #[ORM\OneToMany(targetEntity: CreditRequest::class, mappedBy: 'car')]
+    private Collection $creditRequests;
 
     public function __construct()
     {
         $this->creditRequests = new ArrayCollection();
     }
 
-    public function getBrand(): ?Brand
+    public function getBrand(): Brand
     {
         return $this->brand;
     }
 
-    public function setBrand(?Brand $brand): self
+    public function setBrand(Brand $brand): self
     {
         $this->brand = $brand;
-
         return $this;
     }
 
-    public function getPhoto(): ?string
+    public function getPhoto(): string
     {
         return $this->photo;
     }
@@ -65,11 +52,10 @@ class Car extends BaseEntity
     public function setPhoto(string $photo): self
     {
         $this->photo = $photo;
-
         return $this;
     }
 
-    public function getPrice(): ?int
+    public function getPrice(): int
     {
         return $this->price;
     }
@@ -77,19 +63,17 @@ class Car extends BaseEntity
     public function setPrice(int $price): self
     {
         $this->price = $price;
-
         return $this;
     }
 
-    public function getModel(): ?Model
+    public function getModel(): Model
     {
         return $this->model;
     }
 
-    public function setModel(?Model $model): self
+    public function setModel(Model $model): self
     {
         $this->model = $model;
-
         return $this;
     }
 
@@ -104,22 +88,19 @@ class Car extends BaseEntity
     public function addCreditRequest(CreditRequest $creditRequest): self
     {
         if (!$this->creditRequests->contains($creditRequest)) {
-            $this->creditRequests[] = $creditRequest;
+            $this->creditRequests->add($creditRequest);
             $creditRequest->setCar($this);
         }
-
         return $this;
     }
 
     public function removeCreditRequest(CreditRequest $creditRequest): self
     {
         if ($this->creditRequests->removeElement($creditRequest)) {
-            // set the owning side to null (unless already changed)
             if ($creditRequest->getCar() === $this) {
                 $creditRequest->setCar(null);
             }
         }
-
         return $this;
     }
 }

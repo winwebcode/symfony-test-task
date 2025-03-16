@@ -1,4 +1,4 @@
-FROM php:7.4-fpm
+FROM php:8.2-fpm
 
 # Установка зависимостей
 RUN apt-get update && apt-get install -y \
@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
     opcache
 
 # Установка Xdebug
-RUN pecl install xdebug-3.1.5 \
+RUN pecl install xdebug \
     && docker-php-ext-enable xdebug
 
 # Конфигурация Xdebug

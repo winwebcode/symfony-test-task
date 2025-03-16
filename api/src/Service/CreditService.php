@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Services;
+namespace App\Service;
 
 use App\DTO\CreditCalculateDto;
 use App\Repository\CreditProgramRepository;
+use RuntimeException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CreditService extends BaseService
 {
 
-    private $creditProgramRepository;
-
-    public function __construct(CreditProgramRepository $creditProgramRepository, ValidatorInterface $validator)
-    {
+    public function __construct(
+        private readonly CreditProgramRepository $creditProgramRepository,
+        ValidatorInterface              $validator
+    ) {
         parent::__construct($validator);
-        $this->creditProgramRepository = $creditProgramRepository;
     }
 
     public function calculate(CreditCalculateDTO $dto): array
@@ -26,7 +26,7 @@ class CreditService extends BaseService
         );
 
         if (!$program) {
-            throw new \RuntimeException('No suitable credit program found');
+            throw new RuntimeException('No suitable credit program found');
         }
 
         //Annuity payment
@@ -40,10 +40,10 @@ class CreditService extends BaseService
         }
 
         return [
-            'programId'         => $program->getId(),
-            'interestRate'      => $program->getInterestRate(),
-            'monthlyPayment'    => (int)round($monthlyPayment),
-            'title'             => $program->getTitle(),
+            'programId'      => $program->getId(),
+            'interestRate'   => $program->getInterestRate(),
+            'monthlyPayment' => (int)round($monthlyPayment),
+            'title'          => $program->getTitle(),
         ];
     }
 }
